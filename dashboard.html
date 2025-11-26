@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | E-DERA</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#1e293b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom utilities for minimal animations */
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -2px;
+            left: 0;
+            background-color: #0f172a; /* Slate 900 */
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Pulse animation for alerts */
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+        }
+        .pulse-ring {
+            animation: pulse-ring 1.5s ease-out infinite;
+        }
+
+        /* Risk meter styles */
+        .risk-meter {
+            position: relative;
+            height: 8px;
+            background: linear-gradient(to right, #10b981, #fbbf24, #ef4444);
+            border-radius: 9999px;
+            overflow: visible;
+        }
+        .risk-indicator {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 3px solid #ef4444;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body class="font-sans text-slate-600 antialiased bg-slate-50 selection:bg-slate-200 selection:text-slate-900">
+
+    <!-- Navigation (Same as other pages) -->
+    <nav class="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-slate-200 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex-shrink-0">
+                    <a href="index.html" class="text-2xl font-bold tracking-tight text-slate-900">
+                        E-DERA
+                    </a>
+                </div>
+
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="upload.html" class="nav-link text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Upload Data</a>
+                        <a href="dashboard.html" class="nav-link text-sm font-medium text-slate-900">Dashboard</a>
+                        <a href="index.html#features" class="nav-link text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Features</a>
+                        <a href="#" class="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Logout</a>
+                    </div>
+                </div>
+
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" class="inline-flex items-center justify-center p-2 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="hidden md:hidden border-b border-slate-100 bg-white" id="mobile-menu">
+            <div class="px-4 pt-2 pb-6 space-y-1 sm:px-6">
+                <a href="upload.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">Upload Data</a>
+                <a href="dashboard.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-900 bg-slate-50">Dashboard</a>
+                <a href="index.html#features" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50">Features</a>
+                <a href="#" class="block mt-4 px-3 py-3 rounded-md text-center font-medium text-slate-600 hover:text-slate-900">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Content -->
+    <section class="py-8 lg:py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-slate-900 mb-2">
+                    Financial Dashboard
+                </h1>
+                <p class="text-slate-600">Real-time insights and AI-powered predictions for your business</p>
+            </div>
+
+            <!-- Advanced Analysis Banner (shown if advanced analysis was used) -->
+            <div id="advanced-banner" class="hidden mb-8">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h2 class="text-lg font-semibold text-slate-900 mb-1">Advanced Analysis Mode</h2>
+                            <p class="text-slate-500 text-sm">Enhanced with 9 ML models</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-4xl font-bold text-slate-900" id="e-risk-score">--</div>
+                            <div class="text-slate-500 text-sm mt-1" id="e-risk-level">E-Risk Score</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">0-30 Low · 31-60 Med · 61-100 High</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Model Contributions -->
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6 pt-4 border-t border-slate-200">
+                        <div class="bg-slate-50 rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="text-xl font-semibold text-slate-900" id="contrib-forecast">--</div>
+                                <div class="w-2 h-2 rounded-full bg-blue-400" title="Future prediction impact"></div>
+                            </div>
+                            <div class="text-slate-500 text-xs mt-1">Forecasting</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">Future Outlook</div>
+                        </div>
+                        <div class="bg-slate-50 rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="text-xl font-semibold text-slate-900" id="contrib-anomaly">--</div>
+                                <div class="w-2 h-2 rounded-full bg-orange-400" title="Anomaly detection impact"></div>
+                            </div>
+                            <div class="text-slate-500 text-xs mt-1">Anomaly</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">Current Issues</div>
+                        </div>
+                        <div class="bg-slate-50 rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="text-xl font-semibold text-slate-900" id="contrib-invoice">--</div>
+                                <div class="w-2 h-2 rounded-full bg-rose-400" title="Payment delay risk impact"></div>
+                            </div>
+                            <div class="text-slate-500 text-xs mt-1">Invoice</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">Payment Risk</div>
+                        </div>
+                        <div class="bg-slate-50 rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="text-xl font-semibold text-slate-900" id="contrib-traditional">--</div>
+                                <div class="w-2 h-2 rounded-full bg-slate-400" title="Current metrics impact"></div>
+                            </div>
+                            <div class="text-slate-500 text-xs mt-1">Traditional</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">Present State</div>
+                        </div>
+                        <div class="bg-slate-50 rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="text-xl font-semibold text-slate-900" id="contrib-context">--</div>
+                                <div class="w-2 h-2 rounded-full bg-purple-400" title="Historical trends impact"></div>
+                            </div>
+                            <div class="text-slate-500 text-xs mt-1">Historical</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">Past Patterns</div>
+                        </div>
+                    </div>
+
+                    <!-- Key Insights -->
+                    <div id="key-insights" class="mt-6 space-y-2 pt-4 border-t border-slate-200">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards (Top Row) -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                
+                <!-- Card 1: Financial Risk Score -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                        </div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 uppercase tracking-wider">
+                            High Risk
+                        </span>
+                    </div>
+                    <h3 class="text-sm font-medium text-slate-500 mb-2">Financial Risk Score</h3>
+                    <div class="flex items-baseline gap-2 mb-4">
+                        <span class="text-4xl font-bold text-slate-900">72</span>
+                        <span class="text-lg text-slate-400">/ 100</span>
+                    </div>
+                    <div class="risk-meter mb-4">
+                        <div class="risk-indicator" style="left: 72%;"></div>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        High risk of cash shortfall in next <span class="font-semibold text-red-600">21 days</span>.
+                    </p>
+                </div>
+
+                <!-- Card 2: Cashflow Forecast -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <h3 class="text-sm font-medium text-slate-500 mb-2">Cashflow Forecast (30 Days)</h3>
+                    <div class="mb-4">
+                        <div class="flex items-baseline gap-2 mb-1">
+                            <span class="text-2xl font-bold text-red-600">₹−12,000</span>
+                        </div>
+                        <p class="text-xs text-slate-500">Predicted Minimum Balance</p>
+                    </div>
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                        <div class="flex items-center gap-2">
+                            <div class="relative flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                            </div>
+                            <p class="text-sm font-medium text-red-900">Liquidity risk on Day 18</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Expense Anomalies -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold bg-amber-100 text-amber-700">
+                            2
+                        </span>
+                    </div>
+                    <h3 class="text-sm font-medium text-slate-500 mb-4">Expense Anomalies Detected</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                                <span class="text-sm text-slate-700">Marketing</span>
+                            </div>
+                            <span class="text-sm font-semibold text-red-600">↑ 48%</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                                <span class="text-sm text-slate-700">Utilities</span>
+                            </div>
+                            <span class="text-sm font-semibold text-amber-600">↑ 33%</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <p class="text-xs text-slate-500">Detected this week</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Metric Cards Row -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <!-- Avg Daily Sales -->
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl shadow-sm border border-blue-100 p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-slate-600">Avg Daily Sales</h3>
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold text-blue-900" id="avgDailySales">₹45,200</p>
+                    <p class="text-xs text-blue-700 mt-1" id="salesTrend">+12% vs last period</p>
+                </div>
+
+                <!-- Avg Daily Expenses -->
+                <div class="bg-gradient-to-br from-rose-50 to-pink-50 rounded-xl shadow-sm border border-rose-100 p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-slate-600">Avg Daily Expenses</h3>
+                        <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold text-rose-900" id="avgDailyExpenses">₹38,800</p>
+                    <p class="text-xs text-rose-700 mt-1" id="expensesTrend">+8% vs last period</p>
+                </div>
+
+                <!-- Burn Rate -->
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl shadow-sm border border-amber-100 p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-slate-600">Daily Burn Rate</h3>
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold text-amber-900" id="burnRate">₹6,400</p>
+                    <p class="text-xs text-amber-700 mt-1">Net daily outflow</p>
+                </div>
+
+                <!-- Runway Days -->
+                <div class="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-sm font-medium text-slate-600">Cash Runway</h3>
+                        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <p class="text-3xl font-bold text-slate-900" id="runwayDays">174 days</p>
+                    <p class="text-xs text-slate-600 mt-1">Until cash depletes</p>
+                </div>
+            </div>
+
+            <!-- Cashflow Prediction Chart (Large Section) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-slate-900 mb-1">Projected Cashflow – Next 30 Days</h2>
+                    <p class="text-sm text-slate-500">Based on last 60 days of sales and expenses</p>
+                </div>
+                <div class="relative" style="height: 400px;">
+                    <canvas id="cashflowChart"></canvas>
+                </div>
+                <div class="mt-6 flex items-center justify-center gap-6 text-sm">
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                        <span class="text-slate-600">Projected Balance</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-3 h-3 rounded-full bg-red-200"></div>
+                        <span class="text-slate-600">Risk Zone</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Charts Row: Sales vs Expenses + Expense Breakdown -->
+            <div class="grid lg:grid-cols-2 gap-6 mb-8">
+                <!-- Sales vs Expenses Trend -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="mb-4">
+                        <h2 class="text-lg font-bold text-slate-900 mb-1">Sales vs Expenses Trend</h2>
+                        <p class="text-sm text-slate-500">Daily comparison over last 30 days</p>
+                    </div>
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="salesExpensesChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Expense Category Breakdown -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="mb-4">
+                        <h2 class="text-lg font-bold text-slate-900 mb-1">Expense Category Breakdown</h2>
+                        <p class="text-sm text-slate-500">Distribution by category</p>
+                    </div>
+                    <div class="relative" style="height: 300px;">
+                        <canvas id="expenseCategoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Balance Volatility Chart -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-slate-900 mb-1">Balance Volatility Analysis</h2>
+                    <p class="text-sm text-slate-500">Daily balance variance and stability metrics</p>
+                </div>
+                <div class="relative" style="height: 300px;">
+                    <canvas id="volatilityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Two-Column Section: Anomalies + High-Risk Invoices -->
+            <div class="grid lg:grid-cols-2 gap-6 mb-8">
+                
+                <!-- Anomaly Detection Panel (Left) -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg font-bold text-slate-900">Expense & Behavior Anomalies</h2>
+                            <span class="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">In Development</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Anomaly 1 -->
+                        <div class="p-4 bg-red-50 border-l-4 border-red-500 rounded-lg">
+                            <div class="flex items-start justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="font-semibold text-red-900 text-sm">Marketing Expense</span>
+                                </div>
+                                <span class="text-xs font-bold text-red-700 bg-red-100 px-2 py-1 rounded">Critical</span>
+                            </div>
+                            <p class="text-sm text-red-800 mb-2">48% above normal spending pattern</p>
+                            <div class="w-full bg-red-200 rounded-full h-2">
+                                <div class="bg-red-600 h-2 rounded-full" style="width: 81%"></div>
+                            </div>
+                            <p class="text-xs text-red-700 mt-1">Severity: 0.81</p>
+                        </div>
+
+                        <!-- Anomaly 2 -->
+                        <div class="p-4 bg-amber-50 border-l-4 border-amber-500 rounded-lg">
+                            <div class="flex items-start justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="font-semibold text-amber-900 text-sm">Supplier Payments</span>
+                                </div>
+                                <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-1 rounded">Medium</span>
+                            </div>
+                            <p class="text-sm text-amber-800 mb-2">Delayed 2× this month</p>
+                            <div class="w-full bg-amber-200 rounded-full h-2">
+                                <div class="bg-amber-600 h-2 rounded-full" style="width: 63%"></div>
+                            </div>
+                            <p class="text-xs text-amber-700 mt-1">Severity: 0.63</p>
+                        </div>
+
+                        <!-- Anomaly 3 (Good) -->
+                        <div class="p-4 bg-green-50 border-l-4 border-green-500 rounded-lg">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <div>
+                                    <span class="font-semibold text-green-900 text-sm block">No Inventory Anomalies Detected</span>
+                                    <p class="text-xs text-green-700 mt-1">All systems normal</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High-Risk Invoices Panel (Right) -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <h2 class="text-lg font-bold text-slate-900">Invoices at Risk of Delay</h2>
+                            <span class="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">In Development</span>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="border-b border-slate-200">
+                                    <th class="text-left text-xs font-semibold text-slate-600 pb-3">Invoice</th>
+                                    <th class="text-left text-xs font-semibold text-slate-600 pb-3">Customer</th>
+                                    <th class="text-left text-xs font-semibold text-slate-600 pb-3">Due in</th>
+                                    <th class="text-left text-xs font-semibold text-slate-600 pb-3">Risk</th>
+                                    <th class="text-right text-xs font-semibold text-slate-600 pb-3">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <!-- Invoice 1 -->
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="py-3">
+                                        <span class="text-sm font-medium text-slate-900">#INV1043</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="text-sm text-slate-700">S. Traders</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="text-sm text-slate-700">3 days</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
+                                            82%
+                                        </span>
+                                    </td>
+                                    <td class="py-3 text-right">
+                                        <span class="text-sm font-semibold text-slate-900">₹18,500</span>
+                                    </td>
+                                </tr>
+                                <!-- Invoice 2 -->
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="py-3">
+                                        <span class="text-sm font-medium text-slate-900">#INV1051</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="text-sm text-slate-700">V-Mart</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="text-sm text-slate-700">7 days</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">
+                                            64%
+                                        </span>
+                                    </td>
+                                    <td class="py-3 text-right">
+                                        <span class="text-sm font-semibold text-slate-900">₹12,200</span>
+                                    </td>
+                                </tr>
+                                <!-- Invoice 3 -->
+                                <tr class="hover:bg-slate-50 transition-colors">
+                                    <td class="py-3">
+                                        <span class="text-sm font-medium text-slate-900">#INV1029</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="text-sm text-slate-700">Global Corp</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="text-sm text-slate-700">12 days</span>
+                                    </td>
+                                    <td class="py-3">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                            28%
+                                        </span>
+                                    </td>
+                                    <td class="py-3 text-right">
+                                        <span class="text-sm font-semibold text-slate-900">₹8,750</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-slate-100">
+                        <a href="#" class="text-sm font-medium text-slate-900 hover:text-slate-600 transition-colors">
+                            View All Invoices →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Recommendations Section (Full Width) -->
+            <div class="bg-white rounded-xl shadow-sm border-l-4 border-teal-500 p-8">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 bg-gradient-to-br from-teal-100 to-cyan-100 rounded-xl flex items-center justify-center">
+                        <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h2 class="text-xl font-bold text-slate-900">AI-Generated Actionable Insights</h2>
+                            <span class="text-xs text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-200">In Development</span>
+                        </div>
+                        <p class="text-sm text-slate-500">Personalized recommendations based on your financial data</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <!-- Recommendation 1 -->
+                    <div class="flex gap-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                        <div class="flex-shrink-0 w-8 h-8 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center font-bold text-sm">
+                            1
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-slate-800 leading-relaxed">
+                                <span class="font-semibold text-slate-900">Collect at least ₹18,000</span> from top 2 overdue invoices to avoid a negative balance on Day 18.
+                            </p>
+                            <div class="mt-2 flex gap-2">
+                                <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded font-medium">High Priority</span>
+                                <span class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded font-medium">Cashflow Impact</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation 2 -->
+                    <div class="flex gap-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                        <div class="flex-shrink-0 w-8 h-8 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center font-bold text-sm">
+                            2
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-slate-800 leading-relaxed">
+                                <span class="font-semibold text-slate-900">Reduce discretionary expenses</span> (marketing/inventory) by 10–12% this month to reduce risk score from 72 → 38.
+                            </p>
+                            <div class="mt-2 flex gap-2">
+                                <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded font-medium">Medium Priority</span>
+                                <span class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded font-medium">Risk Reduction</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation 3 -->
+                    <div class="flex gap-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                        <div class="flex-shrink-0 w-8 h-8 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center font-bold text-sm">
+                            3
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-slate-800 leading-relaxed">
+                                <span class="font-semibold text-slate-900">Delay non-critical purchases</span> for 7 days to improve cash buffer by ₹6,200.
+                            </p>
+                            <div class="mt-2 flex gap-2">
+                                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">Action Required</span>
+                                <span class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded font-medium">Quick Win</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommendation 4 -->
+                    <div class="flex gap-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                        <div class="flex-shrink-0 w-8 h-8 bg-teal-100 text-teal-700 rounded-full flex items-center justify-center font-bold text-sm">
+                            4
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-slate-800 leading-relaxed">
+                                <span class="font-semibold text-slate-900">Invoice #1043</span> shows late-payment behavior. Follow up within 24 hours.
+                            </p>
+                            <div class="mt-2 flex gap-2">
+                                <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded font-medium">Urgent</span>
+                                <span class="text-xs bg-slate-200 text-slate-600 px-2 py-1 rounded font-medium">Invoice Management</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-slate-200">
+                    <div class="flex items-center gap-2 text-sm text-slate-500">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Recommendations updated daily based on latest financial data</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer (Same as other pages) -->
+    <footer class="bg-slate-50 border-t border-slate-200 py-12 mt-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                
+                <div class="text-sm">
+                    <p class="font-bold text-slate-900 mb-1">E-DERA</p>
+                    <p class="text-slate-500">AI Economic Distress Early-Warning Radar</p>
+                    <p class="text-slate-400 mt-2">&copy; 2025 E-DERA. All rights reserved.</p>
+                </div>
+
+                <div class="text-sm text-slate-600">
+                    <p class="font-semibold text-slate-900 mb-2">Developed by Ishan Rahul Surdi</p>
+                    <div class="flex flex-col space-y-1">
+                        <a href="https://github.com/ishansurdi" target="_blank" class="flex items-center hover:text-blue-600 transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                            github.com/ishansurdi
+                        </a>
+                        <a href="https://linkedin.com/in/ishanrahulsurdi" target="_blank" class="flex items-center hover:text-blue-600 transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                            linkedin.com/in/ishanrahulsurdi
+                        </a>
+                        <a href="mailto:ishansurdi2005@gmail.com" class="flex items-center hover:text-blue-600 transition-colors">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            ishansurdi2005@gmail.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Chart.js Configuration -->
+    <script>
+        // Load analysis data from sessionStorage
+        const analysisData = JSON.parse(sessionStorage.getItem('analysisData') || '{}');
+        const analysisType = sessionStorage.getItem('analysisType') || 'standard';
+        
+        console.log('Dashboard loaded. Analysis data:', analysisData);
+        console.log('Analysis type:', analysisType);
+        
+        // Check if advanced analysis was used
+        function checkAdvancedAnalysis() {
+            if (analysisType === 'advanced' && analysisData.ensemble_risk && analysisData.ensemble_risk.e_risk_score != null) {
+                // Show advanced banner
+                document.getElementById('advanced-banner').classList.remove('hidden');
+                
+                // Update E-Risk Score
+                const eRisk = analysisData.ensemble_risk;
+                const riskScore = typeof eRisk.e_risk_score === 'number' && !isNaN(eRisk.e_risk_score) 
+                    ? Math.round(eRisk.e_risk_score) 
+                    : '--';
+                document.getElementById('e-risk-score').textContent = riskScore;
+                document.getElementById('e-risk-level').textContent = eRisk.risk_level || 'E-Risk Score';
+                
+                // Update model contributions
+                if (eRisk.model_contributions) {
+                    const contributions = eRisk.model_contributions;
+                    document.getElementById('contrib-forecast').textContent = 
+                        `${(contributions.forecasting_models || 0).toFixed(1)}%`;
+                    document.getElementById('contrib-anomaly').textContent = 
+                        `${(contributions.anomaly_detection || 0).toFixed(1)}%`;
+                    document.getElementById('contrib-invoice').textContent = 
+                        `${(contributions.invoice_risk || 0).toFixed(1)}%`;
+                    document.getElementById('contrib-traditional').textContent = 
+                        `${(contributions.traditional_risk || 0).toFixed(1)}%`;
+                    document.getElementById('contrib-context').textContent = 
+                        `${(contributions.historical_context || 0).toFixed(1)}%`;
+                }
+                
+                // Update key insights
+                if (eRisk.key_insights && eRisk.key_insights.length > 0) {
+                    const insightsContainer = document.getElementById('key-insights');
+                    insightsContainer.innerHTML = eRisk.key_insights.map(insight => 
+                        `<div class="bg-white/10 backdrop-blur rounded-lg p-3 text-sm">${insight}</div>`
+                    ).join('');
+                }
+                
+                console.log('Advanced analysis metrics loaded');
+            }
+        }
+        
+        // Call on page load
+        checkAdvancedAnalysis();
+        
+        // Update dashboard with real data
+        function updateDashboard() {
+            if (!analysisData || (!analysisData.risk && !analysisData.traditional_risk)) {
+                console.log('No analysis data found, using default values');
+                return;
+            }
+
+            // Use traditional_risk for main dashboard (ensemble_risk is shown separately in advanced banner)
+            const risk = analysisData.traditional_risk || analysisData.risk;
+            const forecast = analysisData.advanced_forecasts?.traditional || analysisData.forecast;
+            const anomalies = analysisData.advanced_anomalies?.traditional || analysisData.anomalies || [];
+            const invoices = analysisData.invoice_analysis?.traditional_risks || analysisData.invoices || [];
+            const summary = analysisData.summary;
+            
+            console.log('Updating dashboard with:', { risk, forecast, anomalies, summary });
+
+            // Update Additional Metrics
+            if (summary) {
+                // Avg Daily Sales
+                const avgSales = summary.avg_daily_sales || 45200;
+                document.getElementById('avgDailySales').textContent = 
+                    `₹${Math.round(avgSales).toLocaleString('en-IN')}`;
+                
+                // Avg Daily Expenses
+                const avgExpenses = summary.avg_daily_expenses || 38800;
+                document.getElementById('avgDailyExpenses').textContent = 
+                    `₹${Math.round(avgExpenses).toLocaleString('en-IN')}`;
+                
+                // Burn Rate (net outflow)
+                const burnRate = avgExpenses - avgSales;
+                const burnRateElement = document.getElementById('burnRate');
+                burnRateElement.textContent = burnRate > 0 
+                    ? `₹${Math.round(Math.abs(burnRate)).toLocaleString('en-IN')}`
+                    : `₹${Math.round(Math.abs(burnRate)).toLocaleString('en-IN')}`;
+                burnRateElement.parentElement.querySelector('.text-3xl').classList.remove('text-amber-900', 'text-green-900');
+                burnRateElement.parentElement.querySelector('.text-3xl').classList.add(burnRate > 0 ? 'text-red-900' : 'text-green-900');
+                
+                // Runway Days
+                if (forecast && forecast.summary) {
+                    const currentBalance = forecast.daily_forecast[0]?.cumulative_balance || 1000000;
+                    const runway = burnRate > 0 ? Math.floor(currentBalance / Math.abs(burnRate)) : 999;
+                    document.getElementById('runwayDays').textContent = 
+                        runway > 365 ? '365+ days' : `${runway} days`;
+                }
+                
+                console.log('Updated additional metrics:', { avgSales, avgExpenses, burnRate });
+            }
+
+            // Update Risk Score Card
+            if (risk && risk.overall_score != null && !isNaN(risk.overall_score)) {
+                const riskScoreElement = document.querySelector('.grid.md\\:grid-cols-3 .text-4xl.font-bold');
+                const riskBadgeElement = document.querySelector('.grid.md\\:grid-cols-3 .uppercase.tracking-wider');
+                const riskMessageElement = document.querySelectorAll('.grid.md\\:grid-cols-3 .text-sm')[0];
+                
+                if (riskScoreElement) {
+                    riskScoreElement.textContent = Math.round(risk.overall_score);
+                    console.log('Updated risk score to:', risk.overall_score);
+                    
+                    // Update color based on risk level
+                    riskScoreElement.classList.remove('text-red-600', 'text-yellow-600', 'text-green-600');
+                    if (risk.risk_level === 'LOW') {
+                        riskScoreElement.classList.add('text-green-600');
+                        if (riskBadgeElement) {
+                            riskBadgeElement.textContent = 'Low Risk';
+                            riskBadgeElement.classList.remove('bg-red-100', 'text-red-700', 'bg-yellow-100', 'text-yellow-700');
+                            riskBadgeElement.classList.add('bg-green-100', 'text-green-700');
+                        }
+                    } else if (risk.risk_level === 'MEDIUM') {
+                        riskScoreElement.classList.add('text-yellow-600');
+                        if (riskBadgeElement) {
+                            riskBadgeElement.textContent = 'Medium Risk';
+                            riskBadgeElement.classList.remove('bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+                            riskBadgeElement.classList.add('bg-yellow-100', 'text-yellow-700');
+                        }
+                    } else {
+                        riskScoreElement.classList.add('text-red-600');
+                        if (riskBadgeElement) {
+                            riskBadgeElement.textContent = 'High Risk';
+                        }
+                    }
+                }
+                
+                // Update risk indicator position
+                const riskIndicator = document.querySelector('.risk-indicator');
+                if (riskIndicator) {
+                    riskIndicator.style.left = `${risk.overall_score}%`;
+                    if (risk.risk_level === 'LOW') {
+                        riskIndicator.style.borderColor = '#10b981';
+                    } else if (risk.risk_level === 'MEDIUM') {
+                        riskIndicator.style.borderColor = '#fbbf24';
+                    } else {
+                        riskIndicator.style.borderColor = '#ef4444';
+                    }
+                }
+                
+                // Update risk message
+                if (riskMessageElement) {
+                    riskMessageElement.innerHTML = risk.message || `Risk level: ${risk.risk_level}`;
+                }
+            }
+
+            // Update Cashflow Forecast Card
+            if (forecast && forecast.summary) {
+                const minBalanceElement = document.querySelectorAll('.grid.md\\:grid-cols-3 .text-2xl.font-bold')[0];
+                const riskDayElement = document.querySelector('.bg-red-50 .text-sm.font-medium');
+                
+                if (minBalanceElement) {
+                    const minBalance = forecast.summary.min_balance;
+                    const formattedBalance = minBalance < 0 
+                        ? `₹−${Math.abs(minBalance).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`
+                        : `₹${minBalance.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
+                    minBalanceElement.textContent = formattedBalance;
+                    
+                    // Update color
+                    minBalanceElement.classList.remove('text-red-600', 'text-green-600');
+                    minBalanceElement.classList.add(minBalance < 0 ? 'text-red-600' : 'text-green-600');
+                    console.log('Updated min balance to:', formattedBalance);
+                }
+                
+                if (riskDayElement) {
+                    riskDayElement.textContent = `Liquidity risk on Day ${forecast.summary.min_balance_day}`;
+                }
+            }
+
+            // Update Anomalies Card
+            if (anomalies && anomalies.length > 0) {
+                const anomalyCountElement = document.querySelector('.text-5xl.font-bold.text-orange-600');
+                if (anomalyCountElement) {
+                    anomalyCountElement.textContent = Math.min(anomalies.length, 99);
+                    console.log('Updated anomaly count to:', anomalies.length);
+                }
+            }
+        }
+
+        // Call update function on page load
+        updateDashboard();
+
+        // Cashflow Chart
+        const ctx = document.getElementById('cashflowChart').getContext('2d');
+        
+        // Use real forecast data or fallback to mock data
+        let days, cashflowData;
+        
+        if (analysisData && analysisData.forecast && analysisData.forecast.daily_forecast) {
+            const forecastData = analysisData.forecast.daily_forecast;
+            days = forecastData.map((d, i) => `Day ${i + 1}`);
+            cashflowData = forecastData.map(d => d.cumulative_balance);
+            console.log('Using real forecast data:', cashflowData.length, 'days');
+        } else {
+            // Fallback mock data
+            days = Array.from({length: 30}, (_, i) => `Day ${i + 1}`);
+            cashflowData = [
+                24000, 23500, 22800, 21900, 20500, 19800, 18500,
+                17200, 16800, 15900, 14200, 12800, 11500, 10200,
+                9200, 7800, 6500, 4200, 1900, 800, -500,
+                -2100, -3800, -5200, -6800, -8500, -9800, -11200, -12000, -12500
+            ];
+            console.log('Using mock forecast data');
+        }
+
+        const cashflowChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: days,
+                datasets: [{
+                    label: 'Projected Balance (₹)',
+                    data: cashflowData,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: '#3b82f6',
+                    pointHoverBorderColor: '#fff',
+                    pointHoverBorderWidth: 2
+                },
+                {
+                    label: 'Risk Zone',
+                    data: Array(30).fill(0),
+                    borderColor: 'rgba(239, 68, 68, 0.3)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: '-1',
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 12,
+                        titleColor: '#fff',
+                        bodyColor: '#cbd5e1',
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                if (context.datasetIndex === 0) {
+                                    let value = context.parsed.y;
+                                    return 'Balance: ₹' + value.toLocaleString('en-IN');
+                                }
+                                return null;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 10,
+                            color: '#64748b',
+                            font: {
+                                size: 11
+                            }
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: '#f1f5f9',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#64748b',
+                            font: {
+                                size: 11
+                            },
+                            callback: function(value) {
+                                return '₹' + value.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            }
+        });
+        
+        // ============ Sales vs Expenses Trend Chart ============
+        const salesExpensesCtx = document.getElementById('salesExpensesChart').getContext('2d');
+        
+        let salesData, expensesData, trendDays;
+        
+        if (analysisData && analysisData.summary && analysisData.summary.daily_data) {
+            const dailyData = analysisData.summary.daily_data.slice(-30); // Last 30 days
+            trendDays = dailyData.map((d, i) => `Day ${i + 1}`);
+            salesData = dailyData.map(d => d.sales || 0);
+            expensesData = dailyData.map(d => d.expenses || 0);
+            console.log('Using real sales/expenses data');
+        } else {
+            // Fallback mock data
+            trendDays = Array.from({length: 30}, (_, i) => `Day ${i + 1}`);
+            salesData = Array.from({length: 30}, () => 40000 + Math.random() * 15000);
+            expensesData = Array.from({length: 30}, () => 35000 + Math.random() * 10000);
+            console.log('Using mock sales/expenses data');
+        }
+        
+        const salesExpensesChart = new Chart(salesExpensesCtx, {
+            type: 'line',
+            data: {
+                labels: trendDays,
+                datasets: [
+                    {
+                        label: 'Sales',
+                        data: salesData,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    },
+                    {
+                        label: 'Expenses',
+                        data: expensesData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#ef4444',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 8,
+                            color: '#64748b',
+                            font: { size: 10 }
+                        }
+                    },
+                    y: {
+                        grid: { color: '#f1f5f9' },
+                        ticks: {
+                            color: '#64748b',
+                            font: { size: 10 },
+                            callback: function(value) {
+                                return '₹' + (value/1000).toFixed(0) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // ============ Expense Category Breakdown Chart ============
+        const expenseCategoryCtx = document.getElementById('expenseCategoryChart').getContext('2d');
+        
+        let categoryLabels, categoryValues, categoryColors;
+        
+        if (analysisData && analysisData.summary && analysisData.summary.expense_by_category) {
+            const categories = analysisData.summary.expense_by_category;
+            categoryLabels = Object.keys(categories);
+            categoryValues = Object.values(categories);
+            categoryColors = [
+                '#3b82f6', '#ef4444', '#10b981', '#f59e0b', 
+                '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'
+            ];
+            console.log('Using real expense categories');
+        } else {
+            // Fallback mock data
+            categoryLabels = ['Salary', 'Marketing', 'Operations', 'Utilities', 'Rent', 'Supplies'];
+            categoryValues = [450000, 180000, 120000, 85000, 75000, 60000];
+            categoryColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
+            console.log('Using mock expense categories');
+        }
+        
+        const expenseCategoryChart = new Chart(expenseCategoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryValues,
+                    backgroundColor: categoryColors,
+                    borderColor: '#fff',
+                    borderWidth: 3,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            padding: 15,
+                            font: { size: 11 },
+                            generateLabels: function(chart) {
+                                const data = chart.data;
+                                if (data.labels.length && data.datasets.length) {
+                                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    return data.labels.map((label, i) => {
+                                        const value = data.datasets[0].data[i];
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return {
+                                            text: `${label}: ${percentage}%`,
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: false,
+                                            index: i
+                                        };
+                                    });
+                                }
+                                return [];
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                return `${label}: ₹${value.toLocaleString('en-IN')} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // ============ Balance Volatility Chart ============
+        const volatilityCtx = document.getElementById('volatilityChart').getContext('2d');
+        
+        let volatilityDays, volatilityData, volatilityMin, volatilityMax;
+        
+        if (analysisData && analysisData.forecast && analysisData.forecast.daily_forecast) {
+            const forecastData = analysisData.forecast.daily_forecast;
+            volatilityDays = forecastData.map((d, i) => `Day ${i + 1}`);
+            
+            // Calculate daily variance
+            const balances = forecastData.map(d => d.cumulative_balance);
+            const mean = balances.reduce((a, b) => a + b, 0) / balances.length;
+            volatilityData = balances.map(b => Math.abs(b - mean));
+            
+            // Min/max bounds
+            volatilityMin = balances.map((b, i) => b - volatilityData[i]);
+            volatilityMax = balances.map((b, i) => b + volatilityData[i]);
+            
+            console.log('Using real volatility data');
+        } else {
+            // Fallback mock data
+            volatilityDays = Array.from({length: 30}, (_, i) => `Day ${i + 1}`);
+            const baseBalance = 1000000;
+            volatilityData = Array.from({length: 30}, (_, i) => {
+                const trend = -i * 2000;
+                const variance = 50000 + Math.random() * 30000;
+                return baseBalance + trend;
+            });
+            volatilityMin = volatilityData.map(v => v - 30000);
+            volatilityMax = volatilityData.map(v => v + 30000);
+            console.log('Using mock volatility data');
+        }
+        
+        const volatilityChart = new Chart(volatilityCtx, {
+            type: 'line',
+            data: {
+                labels: volatilityDays,
+                datasets: [
+                    {
+                        label: 'Expected Balance',
+                        data: volatilityData,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderWidth: 3,
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Upper Bound',
+                        data: volatilityMax,
+                        borderColor: 'rgba(16, 185, 129, 0.3)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        fill: '+1',
+                        tension: 0.4,
+                        pointRadius: 0
+                    },
+                    {
+                        label: 'Lower Bound',
+                        data: volatilityMin,
+                        borderColor: 'rgba(239, 68, 68, 0.3)',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 15,
+                            font: { size: 12 }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString('en-IN');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            maxRotation: 0,
+                            autoSkip: true,
+                            maxTicksLimit: 10,
+                            color: '#64748b',
+                            font: { size: 10 }
+                        }
+                    },
+                    y: {
+                        grid: { color: '#f1f5f9' },
+                        ticks: {
+                            color: '#64748b',
+                            font: { size: 10 },
+                            callback: function(value) {
+                                return '₹' + (value/1000).toFixed(0) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

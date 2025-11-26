@@ -1,0 +1,26 @@
+# Core FastAPI and server
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Data processing (Python 3.13 compatible - use latest versions)
+pandas>=2.2.0
+numpy>=1.26.0
+scikit-learn>=1.4.0
+
+# LLM integration
+openai>=1.0.0
+anthropic>=0.7.0
+
+# Utilities
+python-dateutil>=2.8.0
+python-dotenv>=1.0.0
+aiofiles>=23.0.0
+
+# Logging and monitoring
+loguru>=0.7.0
+
+# Additional utilities
+psutil>=5.9.0

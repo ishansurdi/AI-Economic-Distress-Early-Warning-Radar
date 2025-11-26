@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-DERA | AI Economic Distress Early-Warning Radar</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind Config for Specific Colors -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            primary: '#4f46e5', // Deep Indigo
+                            secondary: '#fb7185', // Soft Coral
+                            dark: '#0f172a', // Slate 900
+                            light: '#f8fafc', // Slate 50
+                        }
+                    },
+                    boxShadow: {
+                        'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
+                        'glow': '0 0 20px rgba(79, 70, 229, 0.15)',
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Smooth fade for mobile menu */
+        .mobile-menu {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .mobile-menu.open {
+            max-height: 400px;
+            opacity: 1;
+        }
+        /* Glassmorphism utility */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="font-sans text-slate-600 antialiased bg-brand-lightSelection:bg-brand-primary/20 selection:text-brand-primary">
+
+    <!-- 1. Sticky Header -->
+    <nav class="sticky top-0 z-50 w-full glass border-b border-slate-200/50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center gap-2 group">
+                    <!-- <div class="w-10 h-10 bg-gradient-to-tr from-brand-primary to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-primary/20 group-hover:scale-105 transition-transform">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div> -->
+                    <span class="text-2xl font-bold tracking-tight text-brand-dark">E-DERA</span>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-sm font-medium text-slate-600 hover:text-brand-primary transition-colors">Home</a>
+                    <a href="#features" class="text-sm font-medium text-slate-600 hover:text-brand-primary transition-colors">Features</a>
+                    <a href="#how-it-works" class="text-sm font-medium text-slate-600 hover:text-brand-primary transition-colors">How It Works</a>
+                    <a href="upload.html" class="text-sm font-medium text-slate-600 hover:text-brand-primary transition-colors">Upload Data</a>
+                    <a href="dashboard.html" class="px-6 py-2.5 text-sm font-medium text-white bg-slate-900 rounded-full hover:bg-slate-800 transition-all shadow-md hover:shadow-lg">
+                        Dashboard
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="-mr-2 flex md:hidden">
+                    <button id="menu-btn" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-slate-500 hover:text-brand-primary hover:bg-slate-100 focus:outline-none">
+                        <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu md:hidden bg-white border-b border-slate-100">
+            <div class="px-4 pt-2 pb-6 space-y-1">
+                <a href="index.html" class="block px-3 py-2 rounded-md text-base font-medium text-brand-primary bg-indigo-50">Home</a>
+                <a href="#features" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-indigo-50 hover:text-brand-primary">Features</a>
+                <a href="#how-it-works" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-indigo-50 hover:text-brand-primary">How It Works</a>
+                <a href="upload.html" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-indigo-50 hover:text-brand-primary">Upload Data</a>
+                <a href="dashboard.html" class="block mt-4 px-3 py-3 rounded-md text-center font-bold text-white bg-brand-primary">Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. Hero Section -->
+    <section class="relative pt-24 pb-32 lg:pt-40 lg:pb-48 overflow-hidden">
+        <!-- Background Decor (Aesthetic Blurs) -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 -mt-40 w-[800px] h-[800px] rounded-full bg-gradient-to-tr from-brand-primary/30 to-purple-200/30 blur-[120px] opacity-70 -z-10"></div>
+        <div class="absolute bottom-0 right-0 -mb-40 -mr-40 w-[600px] h-[600px] rounded-full bg-gradient-to-bl from-brand-secondary/30 to-orange-200/30 blur-[100px] opacity-60 -z-10"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                
+                <!-- Left: Content -->
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center px-4 py-2 rounded-full bg-white/60 backdrop-blur-md border border-brand-primary/10 text-brand-primary text-sm font-semibold uppercase tracking-wider mb-8 shadow-sm">
+                        <span class="flex relative h-3 w-3 mr-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-primary opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-primary"></span>
+                        </span>
+                        AI-Powered Financial Intelligence
+                    </div>
+                    <div class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium text-slate-600 bg-slate-100 mb-6 border border-slate-200">
+                        <span class="flex h-2 w-2 rounded-full bg-emerald-500 mr-2"></span>
+                        System Operational v1.0
+                    </div>
+                    <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight text-brand-dark leading-[1.1] mb-6">
+                        Predict Financial Distress <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-brand-secondary">Before It Happens.</span>
+                    </h1>
+                    <p class="text-xl text-slate-600 mb-10 leading-relaxed">
+                        Secure your business future with institutional-grade AI. Forecast cashflow, detect anomalies, and get real-time risk scores—all in one beautiful dashboard.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-5">
+                        <a href="#" class="inline-flex justify-center items-center px-8 py-4 text-base font-bold text-white bg-slate-900 rounded-2xl hover:bg-slate-800 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1">
+                            Get Started Now
+                        </a>
+                        <a href="#" class="inline-flex justify-center items-center px-8 py-4 text-base font-bold text-brand-dark bg-white border-2 border-slate-200 rounded-2xl hover:border-slate-900 hover:text-slate-900 transition-all hover:bg-slate-50">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Watch Demo
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right: Visual Card (Glassmorphism & Aesthetic) -->
+                <div class="relative w-full perspective-1000">
+                    <!-- Main Glass Card -->
+                    <div class="glass rounded-3xl shadow-2xl shadow-brand-primary/10 overflow-hidden relative z-20 transform hover:rotate-x-2 transition-transform duration-500 ease-out">
+                        <!-- Card Header -->
+                        <div class="px-8 py-6 border-b border-slate-100/50 flex justify-between items-center bg-white/50">
+                            <div>
+                                <h3 class="text-base font-bold text-brand-dark">30-Day Cashflow Forecast</h3>
+                                <p class="text-sm text-slate-500">AI Confidence: 94%</p>
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100/80 text-emerald-700">
+                                Stable Outlook
+                            </span>
+                        </div>
+                        
+                        <!-- Card Body (Aesthetic Chart) -->
+                        <div class="p-8">
+                            <div class="flex items-end justify-between h-56 mt-4 space-x-3">
+                                <!-- Aesthetic Chart Bars with Gradients -->
+                                <div class="w-full bg-slate-100 rounded-t-xl h-[40%] relative overflow-hidden group"><div class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-brand-primary/40 to-brand-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div></div>
+                                <div class="w-full bg-slate-100 rounded-t-xl h-[55%] relative overflow-hidden group"><div class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-brand-primary/50 to-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div></div>
+                                <div class="w-full bg-slate-100 rounded-t-xl h-[45%] relative overflow-hidden group"><div class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-brand-primary/40 to-brand-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div></div>
+                                <!-- Active/High Bar -->
+                                <div class="w-full bg-gradient-to-t from-brand-primary to-indigo-400 rounded-t-xl h-[85%] relative group shadow-lg shadow-brand-primary/30">
+                                    <div class="absolute -top-12 left-1/2 -translate-x-1/2 bg-brand-dark text-white text-xs font-bold py-1.5 px-3 rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:-translate-y-1">
+                                        $18,400
+                                        <svg class="absolute text-brand-dark h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255" xml:space="preserve"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
+                                    </div>
+                                </div>
+                                <div class="w-full bg-slate-100 rounded-t-xl h-[65%] relative overflow-hidden group"><div class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-brand-primary/50 to-brand-primary/20 opacity-0 group-hover:opacity-100 transition-opacity"></div></div>
+                                <!-- Projected Bar -->
+                                <div class="w-full bg-white/50 border-2 border-dashed border-brand-secondary/50 rounded-t-xl h-[75%] relative overflow-hidden">
+                                    <div class="absolute bottom-0 left-0 w-full h-full bg-gradient-to-t from-brand-secondary/20 to-transparent"></div>
+                                    <span class="absolute top-3 left-1/2 -translate-x-1/2 text-xs text-brand-secondary font-bold uppercase tracking-wider">Proj.</span>
+                                </div>
+                            </div>
+                            <!-- Legend/Stats -->
+                            <div class="flex justify-between mt-8 pt-6 border-t border-slate-100/50">
+                                <div>
+                                    <p class="text-sm text-slate-400 font-medium mb-1">Current Risk Score</p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-3xl font-extrabold text-brand-dark">14</span>
+                                        <span class="text-sm text-emerald-500 font-bold bg-emerald-50 px-2 py-0.5 rounded-md">Low</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-slate-400 font-medium mb-1">Projected Balance</p>
+                                    <p class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-indigo-600">$42,500</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+
+                    <!-- Floating Aesthetic Badge -->
+                    <div class="absolute -right-12 -bottom-12 glass p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.1)] z-30 animate-bounce-slow" style="animation-duration: 4s;">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-gradient-to-br from-brand-secondary to-rose-400 rounded-xl text-white shadow-lg shadow-brand-secondary/30">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-brand-secondary uppercase tracking-wider mb-1">Anomaly Detected</p>
+                                <p class="text-lg font-bold text-brand-dark leading-tight">Unusual Vendor<br>Payment</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Decor elements behind card -->
+                    <div class="absolute top-1/2 right-1/2 -translate-y-1/2 translate-x-1/2 w-[90%] h-[90%] rounded-3xl bg-gradient-to-tr from-brand-primary/5 to-brand-secondary/5 blur-2xl -z-10"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Features Section (Minimal & Aesthetic) -->
+    <section id="features" class="py-24 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-20">
+                <span class="text-brand-primary font-bold tracking-wider uppercase text-sm bg-indigo-50/50 px-4 py-2 rounded-full">Our Core Engines</span>
+                <h2 class="text-4xl md:text-5xl font-extrabold text-brand-dark mt-6 mb-6">Financial Clarity in Three Steps.</h2>
+                <p class="text-xl text-slate-600 leading-relaxed">Complex data processed into simple, actionable signals. No finance degree required.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 lg:gap-12">
+                <!-- Feature 1 -->
+                <div class="group bg-white rounded-3xl p-8 hover:shadow-2xl hover:shadow-brand-primary/10 transition-all duration-300 hover:-translate-y-2 border border-slate-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-gradient-to-bl from-brand-primary/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
+                    
+                    <div class="w-16 h-16 bg-gradient-to-tr from-brand-primary/10 to-indigo-100/50 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-brand-dark mb-4">AI Forecasting</h3>
+                    <p class="text-slate-600 leading-relaxed text-lg">
+                        Predict 30-day cashflow with <span class="font-semibold text-brand-primary">94% accuracy</span>. Our models learn your unique seasonality and payment patterns.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="group bg-white rounded-3xl p-8 hover:shadow-2xl hover:shadow-brand-secondary/10 transition-all duration-300 hover:-translate-y-2 border border-slate-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-gradient-to-bl from-brand-secondary/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
+
+                    <div class="w-16 h-16 bg-gradient-to-tr from-brand-secondary/10 to-rose-100/50 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-brand-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-brand-dark mb-4">Anomaly Detection</h3>
+                    <p class="text-slate-600 leading-relaxed text-lg">
+                        Instantly spot unusual spending, duplicate invoices, and revenue delays before they burn through your runway.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="group bg-white rounded-3xl p-8 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 hover:-translate-y-2 border border-slate-100 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-gradient-to-bl from-amber-400/20 to-transparent rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500"></div>
+
+                    <div class="w-16 h-16 bg-gradient-to-tr from-amber-100/50 to-orange-100/50 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold text-brand-dark mb-4">Risk Scoring</h3>
+                    <p class="text-slate-600 leading-relaxed text-lg">
+                        A simple 0-100 financial health score. Use it for internal decisions or share it to secure funding faster.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. How It Works Section (Connected & Clean) -->
+    <section id="how-it-works" class="py-32 relative">
+        <!-- Background Decor -->
+        <div class="absolute inset-0 bg-brand-light -z-20"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl h-2 bg-gradient-to-r from-transparent via-brand-primary/10 to-transparent rounded-full -z-10 hidden md:block"></div>
+
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl font-extrabold text-brand-dark">How E-DERA Works</h2>
+                <p class="mt-4 text-xl text-slate-600">From raw data to actionable strategy in four simple steps.</p>
+            </div>
+
+            <div class="relative">
+                <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-slate-200 -translate-y-1/2 z-0"></div>
+
+                <div class="grid md:grid-cols-4 gap-8 relative z-10">
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 text-center">
+                        <div class="w-16 h-16 mx-auto bg-slate-900 rounded-full flex items-center justify-center text-white mb-4 shadow-lg ring-4 ring-slate-50">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">1. Upload Data</h4>
+                        <p class="text-sm text-slate-500">Upload your sales and expenses in CSV format securely.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 text-center">
+                        <div class="w-16 h-16 mx-auto bg-white border-2 border-slate-200 rounded-full flex items-center justify-center text-slate-700 mb-4 shadow-sm ring-4 ring-slate-50">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">2. Processing</h4>
+                        <p class="text-sm text-slate-500">AI cleans and converts your data into a daily financial timeline.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 text-center">
+                        <div class="w-16 h-16 mx-auto bg-white border-2 border-slate-200 rounded-full flex items-center justify-center text-slate-700 mb-4 shadow-sm ring-4 ring-slate-50">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">3. Analysis</h4>
+                        <p class="text-sm text-slate-500">Machine learning models run to predict cashflow & calculate risk.</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200 text-center">
+                        <div class="w-16 h-16 mx-auto bg-white border-2 border-slate-200 rounded-full flex items-center justify-center text-slate-700 mb-4 shadow-sm ring-4 ring-slate-50">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-bold text-slate-900 mb-2">4. Insights</h4>
+                        <p class="text-sm text-slate-500">View the dashboard to see your alerts and financial forecast.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- 5. Stats/Trust Section -->
+    <section class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-4 gap-8 text-center">
+                <div class="space-y-2">
+                    <div class="text-5xl font-extrabold text-brand-primary">94%</div>
+                    <div class="text-sm text-slate-600 font-medium">Forecast Accuracy</div>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-5xl font-extrabold text-brand-primary">15ms</div>
+                    <div class="text-sm text-slate-600 font-medium">Analysis Speed</div>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-5xl font-extrabold text-brand-primary">9</div>
+                    <div class="text-sm text-slate-600 font-medium">ML Models</div>
+                </div>
+                <div class="space-y-2">
+                    <div class="text-5xl font-extrabold text-brand-primary">100%</div>
+                    <div class="text-sm text-slate-600 font-medium">Data Privacy</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Technology Stack Section -->
+    <section class="py-24 bg-gradient-to-b from-slate-50 to-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="text-brand-primary font-bold tracking-wider uppercase text-sm bg-indigo-50/50 px-4 py-2 rounded-full">Powered By</span>
+                <h2 class="text-4xl font-extrabold text-brand-dark mt-6">Advanced ML Architecture</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">9 state-of-the-art models working in ensemble to deliver institutional-grade predictions</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Forecasting Models -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-slate-900">Forecasting</h4>
+                    </div>
+                    <ul class="space-y-2 text-sm text-slate-600">
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>DA-GRU (Dual Attention)</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>Temporal Fusion Transformer</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>N-BEATS Decomposition</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>DeepAR Probabilistic</li>
+                    </ul>
+                </div>
+
+                <!-- Anomaly Detection -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-slate-900">Anomaly Detection</h4>
+                    </div>
+                    <ul class="space-y-2 text-sm text-slate-600">
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>Deep Denoising Autoencoder</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>Isolation Forest</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>Graph Attention Network</li>
+                    </ul>
+                </div>
+
+                <!-- Risk Modeling -->
+                <div class="bg-white rounded-2xl p-6 border border-slate-200 hover:shadow-lg transition-shadow">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 bg-rose-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-slate-900">Risk Modeling</h4>
+                    </div>
+                    <ul class="space-y-2 text-sm text-slate-600">
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>TabNet Invoice Risk</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>Gradient Boosted Ensemble</li>
+                        <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-primary rounded-full"></span>Meta-Risk Aggregation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. CTA Section (Attractive Gradient) -->
+    <section class="py-32 relative overflow-hidden">
+        <!-- Background Gradient & Shapes -->
+        <div class="absolute inset-0 bg-gradient-to-br from-brand-primary/5 via-brand-light to-brand-secondary/5 -z-20"></div>
+        <div class="absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand-primary/20 blur-[100px] -z-10"></div>
+        <div class="absolute bottom-0 right-0 translate-x-1/2 translate-y-1/2 w-[600px] h-[600px] rounded-full bg-brand-secondary/20 blur-[100px] -z-10"></div>
+
+        <div class="max-w-5xl mx-auto px-6 text-center relative z-10">
+            <h2 class="text-5xl md:text-6xl font-extrabold text-brand-dark mb-8 leading-tight">Start Detecting Risks <br> <span class="text-brand-primary">Today.</span></h2>
+            <p class="text-xl text-slate-600 mb-12 max-w-2xl mx-auto">Join smart business owners who use E-DERA to navigate economic uncertainty with confidence and data-driven foresight.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-5">
+                <a href="upload.html" class="inline-block px-10 py-5 text-lg font-bold text-white bg-slate-900 rounded-2xl hover:bg-slate-800 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl">
+                    Create Free Account
+                </a>
+                <a href="upload.html" class="inline-block px-10 py-5 text-lg font-bold text-brand-dark bg-white border-2 border-slate-200 rounded-2xl hover:border-slate-900 hover:text-slate-900 transition-all">
+                    Upload Data Now
+                </a>
+            </div>
+            <p class="mt-6 text-sm text-slate-500 font-medium">No credit card required for 14-day trial.</p>
+        </div>
+    </section>
+
+    <!-- 8. Use Cases Section -->
+    <section class="py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="text-brand-primary font-bold tracking-wider uppercase text-sm bg-indigo-50/50 px-4 py-2 rounded-full">Real-World Impact</span>
+                <h2 class="text-4xl font-extrabold text-brand-dark mt-6 mb-4">Built for Every Business Stage</h2>
+                <p class="text-lg text-slate-600 max-w-2xl mx-auto">From bootstrapped startups to scale-ups, E-DERA adapts to your financial complexity</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Use Case 1 -->
+                <div class="bg-gradient-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200 hover:border-brand-primary/30 transition-all group">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-slate-900">SaaS Startups</h4>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed">Monitor MRR/ARR trends, predict churn impact on cash reserves, and optimize burn rate for runway extension</p>
+                </div>
+
+                <!-- Use Case 2 -->
+                <div class="bg-gradient-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200 hover:border-brand-primary/30 transition-all group">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-slate-900">E-Commerce</h4>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed">Forecast seasonal inventory needs, detect payment gateway anomalies, and manage supplier payment timing</p>
+                </div>
+
+                <!-- Use Case 3 -->
+                <div class="bg-gradient-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200 hover:border-brand-primary/30 transition-all group">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-slate-900">Service Agencies</h4>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed">Track client payment cycles, identify late invoice patterns, and forecast project-based revenue gaps</p>
+                </div>
+
+                <!-- Use Case 4 -->
+                <div class="bg-gradient-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200 hover:border-brand-primary/30 transition-all group">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-slate-900">Manufacturing</h4>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed">Predict working capital needs, detect unusual raw material costs, and optimize payment terms with vendors</p>
+                </div>
+
+                <!-- Use Case 5 -->
+                <div class="bg-gradient-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200 hover:border-brand-primary/30 transition-all group">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-slate-900">Consulting Firms</h4>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed">Manage retainer vs. project cash flow, predict consulting capacity revenue, and flag delayed client payments</p>
+                </div>
+
+                <!-- Use Case 6 -->
+                <div class="bg-gradient-to-br from-slate-50 to-white p-6 rounded-2xl border border-slate-200 hover:border-brand-primary/30 transition-all group">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-slate-900">Tech Hardware</h4>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed">Forecast component procurement timing, detect supply chain cost anomalies, and manage distributor payment cycles</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. Security & Privacy Section -->
+    <section class="py-24 bg-gradient-to-b from-slate-50 to-white">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <!-- Left: Content -->
+                <div>
+                    <span class="text-brand-primary font-bold tracking-wider uppercase text-sm bg-indigo-50/50 px-4 py-2 rounded-full">Enterprise Security</span>
+                    <h2 class="text-4xl font-extrabold text-brand-dark mt-6 mb-6">Your Data Never Leaves Your Control</h2>
+                    <p class="text-lg text-slate-600 mb-8 leading-relaxed">Built with privacy-first architecture. We process your financial data locally and never store sensitive information on external servers.</p>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4 p-4 bg-white rounded-xl border border-slate-200">
+                            <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 mb-1">Local Processing</h4>
+                                <p class="text-sm text-slate-600">All analysis happens on your machine. Your CSV files are processed in-memory and never uploaded to cloud storage.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 p-4 bg-white rounded-xl border border-slate-200">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 mb-1">Zero Data Retention</h4>
+                                <p class="text-sm text-slate-600">Session-based analysis means your data is cleared when you close the browser. No persistent storage, no logs.</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4 p-4 bg-white rounded-xl border border-slate-200">
+                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900 mb-1">Open Source Transparency</h4>
+                                <p class="text-sm text-slate-600">Our entire codebase is available on GitHub. Audit our security practices and verify zero backdoors yourself.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Visual -->
+                <div class="relative">
+                    <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl">
+                        <div class="space-y-4">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                                    <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                                    <div class="w-3 h-3 rounded-full bg-green-400"></div>
+                                </div>
+                                <div class="flex items-center gap-2 text-xs text-slate-500">
+                                    <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+                                    <span class="font-mono">Encrypted Session</span>
+                                </div>
+                            </div>
+
+                            <!-- Processing Steps -->
+                            <div class="space-y-3 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-slate-900">CSV Upload</p>
+                                        <p class="text-xs text-slate-500">In-memory processing only</p>
+                                    </div>
+                                    <span class="text-xs text-green-600 font-mono bg-green-50 px-2 py-1 rounded">Local</span>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-slate-900">ML Analysis</p>
+                                        <p class="text-xs text-slate-500">Client-side computation</p>
+                                    </div>
+                                    <span class="text-xs text-green-600 font-mono bg-green-50 px-2 py-1 rounded">Local</span>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-slate-900">Results Display</p>
+                                        <p class="text-xs text-slate-500">Session-only storage</p>
+                                    </div>
+                                    <span class="text-xs text-green-600 font-mono bg-green-50 px-2 py-1 rounded">Local</span>
+                                </div>
+
+                                <div class="flex items-center gap-3 opacity-50">
+                                    <div class="w-8 h-8 bg-slate-300 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-semibold text-slate-400 line-through">Cloud Upload</p>
+                                        <p class="text-xs text-slate-400">Never happens</p>
+                                    </div>
+                                    <span class="text-xs text-slate-400 font-mono bg-slate-100 px-2 py-1 rounded">Disabled</span>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="pt-4 border-t border-slate-200">
+                                <div class="flex items-center justify-between text-xs">
+                                    <div class="flex items-center gap-2 text-slate-600">
+                                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                                        <span>All data remains on your device</span>
+                                    </div>
+                                    <span class="text-slate-500 font-mono">localhost:8000</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Decorative Elements -->
+                    <div class="absolute -top-6 -right-6 w-24 h-24 bg-green-500/10 rounded-full blur-2xl"></div>
+                    <div class="absolute -bottom-6 -left-6 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 10. FAQ Section -->
+    <section class="py-24 bg-white">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <span class="text-brand-primary font-bold tracking-wider uppercase text-sm bg-indigo-50/50 px-4 py-2 rounded-full">Questions?</span>
+                <h2 class="text-4xl font-extrabold text-brand-dark mt-6 mb-4">Frequently Asked Questions</h2>
+                <p class="text-lg text-slate-600">Everything you need to know about E-DERA</p>
+            </div>
+
+            <div class="space-y-4">
+                <details class="group bg-slate-50 rounded-xl overflow-hidden border border-slate-200 hover:border-brand-primary/30 transition-colors">
+                    <summary class="flex items-center justify-between cursor-pointer p-6 font-semibold text-slate-900">
+                        <span>What data format does E-DERA accept?</span>
+                        <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600">
+                        <p>E-DERA accepts CSV files with transaction data including date, description, and amount columns. We support both sales and expenses data. The system automatically cleans and normalizes your data during upload.</p>
+                    </div>
+                </details>
+
+                <details class="group bg-slate-50 rounded-xl overflow-hidden border border-slate-200 hover:border-brand-primary/30 transition-colors">
+                    <summary class="flex items-center justify-between cursor-pointer p-6 font-semibold text-slate-900">
+                        <span>How accurate are the forecasts?</span>
+                        <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600">
+                        <p>Our ensemble of 9 ML models achieves 94% forecast accuracy on average. Accuracy improves with more historical data (minimum 3 months recommended). The system provides confidence intervals for each prediction.</p>
+                    </div>
+                </details>
+
+                <details class="group bg-slate-50 rounded-xl overflow-hidden border border-slate-200 hover:border-brand-primary/30 transition-colors">
+                    <summary class="flex items-center justify-between cursor-pointer p-6 font-semibold text-slate-900">
+                        <span>Is my financial data secure?</span>
+                        <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600">
+                        <p>Absolutely. All processing happens locally on your machine. We never upload your CSV files to external servers, and session data is cleared when you close your browser. Our code is open-source for full transparency.</p>
+                    </div>
+                </details>
+
+                <details class="group bg-slate-50 rounded-xl overflow-hidden border border-slate-200 hover:border-brand-primary/30 transition-colors">
+                    <summary class="flex items-center justify-between cursor-pointer p-6 font-semibold text-slate-900">
+                        <span>What's the difference between Standard and Advanced Analysis?</span>
+                        <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600">
+                        <p>Standard Analysis uses traditional financial ratios and basic forecasting. Advanced Analysis activates all 9 deep learning models including DA-GRU, TFT, N-BEATS, DeepAR, Deep Autoencoder, Isolation Forest, GAT, TabNet, and our Ensemble Meta-Model for comprehensive risk scoring.</p>
+                    </div>
+                </details>
+
+                <details class="group bg-slate-50 rounded-xl overflow-hidden border border-slate-200 hover:border-brand-primary/30 transition-colors">
+                    <summary class="flex items-center justify-between cursor-pointer p-6 font-semibold text-slate-900">
+                        <span>Can I integrate E-DERA with my accounting software?</span>
+                        <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600">
+                        <p>Currently, E-DERA accepts CSV exports from any accounting system (QuickBooks, Xero, FreshBooks, etc.). API integration for automated data sync is on our roadmap for Q2 2025.</p>
+                    </div>
+                </details>
+
+                <details class="group bg-slate-50 rounded-xl overflow-hidden border border-slate-200 hover:border-brand-primary/30 transition-colors">
+                    <summary class="flex items-center justify-between cursor-pointer p-6 font-semibold text-slate-900">
+                        <span>Is this really free for educational use?</span>
+                        <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </summary>
+                    <div class="px-6 pb-6 text-slate-600">
+                        <p>Yes! E-DERA is a student research project and completely free for educational purposes. We built this to demonstrate advanced ML techniques for financial risk assessment. For production use by businesses, please contact us for licensing.</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- 11. Final CTA Banner -->
+    <section class="py-24 bg-white border-t border-slate-200">
+        <div class="max-w-5xl mx-auto px-6 text-center">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-brand-dark mb-6">Ready to Transform Your Financial Strategy?</h2>
+            <p class="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">Join the next generation of data-driven MSMEs using AI for smarter business decisions.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="upload.html" class="inline-block px-10 py-4 text-lg font-bold text-white bg-slate-900 rounded-2xl hover:bg-slate-800 shadow-xl transition-all hover:-translate-y-1 hover:shadow-2xl">
+                    Start Analyzing Now
+                </a>
+                <a href="https://github.com/ishansurdi" target="_blank" class="inline-block px-10 py-4 text-lg font-bold text-slate-900 bg-white border-2 border-slate-200 rounded-2xl hover:border-slate-900 hover:bg-slate-50 transition-all">
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 12. Footer -->
+    <footer class="bg-gradient-to-b from-gray-50 to-gray-100 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <!-- Main Footer Content -->
+            <div class="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
+                <!-- Company Info -->
+                <div class="lg:col-span-2">
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-2xl font-bold text-gray-900">E-DERA</span>
+                    </div>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        AI-powered Economic Distress Early-warning Radar delivering advanced predictive analytics and risk assessment for MSMEs through cutting-edge machine learning and ensemble modeling.
+                    </p>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-2 text-sm text-gray-600">
+                            <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                            <span>ishansurdi2105@gmail.com</span>
+                        </div>
+                        <div class="flex items-center space-x-2 text-sm text-gray-600">
+                            <svg class="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <span>Real-time Analysis Available</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Solutions -->
+                <div>
+                    <h3 class="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Features</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Risk Assessment</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Forecasting Models</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Anomaly Detection</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Invoice Analysis</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Ensemble Intelligence</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Real-time Dashboard</a></li>
+                    </ul>
+                </div>
+
+                <!-- Resources -->
+                <div>
+                    <h3 class="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Resources</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">API Documentation</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Model Architecture</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Data Privacy Guide</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Technical Whitepaper</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Use Cases</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Support Center</a></li>
+                    </ul>
+                </div>
+
+                <!-- Company -->
+                <div>
+                    <h3 class="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Project</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">About E-DERA</a></li>
+                        <li><a href="https://github.com/ishansurdi" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">GitHub Repository</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Research Paper</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Contributors</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Contact</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-teal-600 transition-colors text-sm">Updates</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Technology Stack & Certifications -->
+            <div class="border-t border-gray-300 py-8">
+                <div class="mb-6">
+                    <h4 class="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wider">Technology Stack & ML Models</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-4">
+                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                            <div class="text-xs font-semibold text-gray-700">DA-GRU</div>
+                            <div class="text-xs text-gray-500 mt-1">Forecast</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                            <div class="text-xs font-semibold text-gray-700">TFT</div>
+                            <div class="text-xs text-gray-500 mt-1">Forecast</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                            <div class="text-xs font-semibold text-gray-700">N-BEATS</div>
+                            <div class="text-xs text-gray-500 mt-1">Forecast</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                            <div class="text-xs font-semibold text-gray-700">DeepAR</div>
+                            <div class="text-xs text-gray-500 mt-1">Forecast</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                            <div class="text-xs font-semibold text-gray-700">Autoencoder</div>
+                            <div class="text-xs text-gray-500 mt-1">Anomaly</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                            <div class="text-xs font-semibold text-gray-700">Isolation Forest</div>
+                            <div class="text-xs text-gray-500 mt-1">Anomaly</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                            <div class="text-xs font-semibold text-gray-700">GAT</div>
+                            <div class="text-xs text-gray-500 mt-1">Invoice</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                            <div class="text-xs font-semibold text-gray-700">TabNet</div>
+                            <div class="text-xs text-gray-500 mt-1">Invoice</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-4 border border-gray-200 text-center">
+                            <div class="text-xs font-semibold text-gray-700">Ensemble</div>
+                            <div class="text-xs text-gray-500 mt-1">Meta-Model</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-6">
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <div>
+                            <h5 class="font-semibold text-gray-900 text-sm mb-2"> Educational Project Notice</h5>
+                            <p class="text-xs text-gray-600 leading-relaxed">
+                                <strong>This platform is designed for educational and demonstration purposes only.</strong> E-DERA is a student research project showcasing advanced ML/AI capabilities for financial risk assessment. This is a proof-of-concept demonstrating ensemble learning, deep learning forecasting, and anomaly detection techniques. Not authorized for production financial decision-making or commercial use.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legal Links & Copyright -->
+            <div class="border-t border-gray-300 py-8">
+                <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <div class="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2 text-xs text-gray-600">
+                        <a href="#" class="hover:text-teal-600 transition-colors">Privacy Policy</a>
+                        <a href="#" class="hover:text-teal-600 transition-colors">Terms of Use</a>
+                        <a href="#" class="hover:text-teal-600 transition-colors">Data Policy</a>
+                        <a href="#" class="hover:text-teal-600 transition-colors">Model Documentation</a>
+                        <a href="#" class="hover:text-teal-600 transition-colors">API Terms</a>
+                        <a href="#" class="hover:text-teal-600 transition-colors">Acceptable Use</a>
+                        <a href="#" class="hover:text-teal-600 transition-colors">Security</a>
+                    </div>
+                </div>
+
+                <!-- Copyright & Legal -->
+                <div class="text-center space-y-3 mt-8">
+                    <p class="text-xs text-gray-600">
+                        © 2025 E-DERA by <span class="font-semibold text-teal-600">Ishan Rahul Surdi</span>. All rights reserved.
+                    </p>
+                    <p class="text-xs text-gray-500">
+                        <span class="font-medium">Educational Purpose Only</span> - Student AI/ML research project | Not for production use
+                    </p>
+                    <p class="text-xs text-gray-400 max-w-4xl mx-auto">
+                        <strong>Disclaimer:</strong> E-DERA is a demonstration platform for educational purposes only. This is a student project showcasing advanced machine learning capabilities and does not constitute actual financial advisory services. No real financial decisions should be based solely on this platform's outputs.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Trust & Security Indicators -->
+            <div class="border-t border-gray-300 py-6">
+                <div class="flex flex-wrap justify-center items-center gap-8 text-xs text-gray-500">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <span>Local Processing</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        <span>Data Privacy First</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <span>9 ML Models</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span>&lt;15ms Response</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <span>Open Source</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Developer Info -->
+            <div class="border-t border-gray-300 py-6">
+                <div class="text-center text-xs text-gray-500">
+                    <p class="mb-3">
+                        Developed with ❤️ by <span class="font-semibold text-gray-700">Ishan Rahul Surdi</span>
+                    </p>
+                    <p class="mb-3">
+                        Student Developer | AI/ML Researcher | Financial Analytics Enthusiast
+                    </p>
+                    <p class="text-gray-400 mb-3">
+                        This project showcases ensemble deep learning, advanced forecasting, and anomaly detection for MSME risk assessment.
+                    </p>
+                    
+                    <!-- Social Links -->
+                    <div class="mt-4 flex justify-center space-x-4">
+                        <a href="https://github.com/ishansurdi" target="_blank" class="text-gray-500 hover:text-gray-800 transition-colors" title="GitHub">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                            </svg>
+                        </a>
+                        
+                        <a href="https://www.linkedin.com/in/ishansurdiofficial/" target="_blank" class="text-gray-500 hover:text-blue-600 transition-colors" title="LinkedIn">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.5 11.268h-3v-5.604c0-1.337-.026-3.065-1.868-3.065-1.868 0-2.154 1.459-2.154 2.967v5.702h-3v-10h2.881v1.367h.041c.401-.761 1.381-1.562 2.841-1.562 3.039 0 3.6 2.001 3.6 4.601v5.594z"/>
+                            </svg>
+                        </a>
+                        
+                        <a href="mailto:ishansurdi2105@gmail.com" class="text-gray-500 hover:text-teal-600 transition-colors" title="Email">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                            </svg>
+                        </a>
+                    </div>
+                    
+                    <p class="mt-4 text-xs text-gray-400">
+                        Python 3.13 | FastAPI | 9 Deep Learning Models | Ensemble Meta-Learning
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Simple script for mobile menu toggle -->
+    <script>
+        const btn = document.getElementById('menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('open');
+        });
+    </script>
+</body>
+</html>
