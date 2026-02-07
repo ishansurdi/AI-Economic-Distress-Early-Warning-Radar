@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import uvicorn
 from pathlib import Path
@@ -54,12 +55,20 @@ app.include_router(upload.router)
 app.include_router(analyse.router)
 app.include_router(recommend.router)
 
+# Serve frontend static files at root if available (supports local and hosted deployments)
+FRONTEND_DIR = Path(__file__).resolve().parents[1] / "frontend"
+if FRONTEND_DIR.exists():
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")
+    logger.info(f"Mounted frontend static files from: {FRONTEND_DIR}")
+else:
+    logger.warning(f"Frontend directory not found: {FRONTEND_DIR} - static frontend will not be served")
+
 logger.info("All routers registered successfully")
 
 
-@app.get("/")
-async def root():
-    """Root endpoint"""
+@app.get("/api/info")
+async def api_info():
+    """API information endpoint (use /docs for Swagger UI)"""
     return {
         "application": "E-DERA API",
         "version": "1.0.0",
@@ -70,7 +79,8 @@ async def root():
             "health": "/api/v1/health",
             "upload": "/api/v1/upload",
             "analyse": "/api/v1/analyse",
-            "recommend": "/api/v1/recommend"
+            "recommend": "/api/v1/recommend",
+            "frontend": "/ (serves frontend/index.html if available)"
         }
     }
 

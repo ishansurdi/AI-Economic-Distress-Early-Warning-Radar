@@ -1,0 +1,11 @@
+# Ignore runtime artifacts and large model files
+backend/storage/
+backend/trained_models/
+backend/*.pyc
+__pycache__/
+.git/
+.vscode/
+.env
+.venv/
+node_modules/
+.DS_Store
