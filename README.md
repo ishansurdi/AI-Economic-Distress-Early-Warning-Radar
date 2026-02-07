@@ -1068,7 +1068,7 @@ docker logs -f edera-container
 
 | Role | Name | Contribution | Contact |
 |------|------|--------------|---------|
-| **Lead Developer & ML Engineer** | **Ishan Surdi** | • System architecture design<br>• 9 ML model implementations<br>• Ensemble meta-model framework<br>• Feature engineering pipeline (46 features)<br>• FastAPI backend development<br>• Production deployment | 📧 [ishansurdi@example.com](mailto:ishansurdi@example.com)<br>🔗 [GitHub](https://github.com/ishansurdi) |
+| **Lead Developer & ML Engineer** | **Ishan Surdi** | • System architecture design<br>• 9 ML model implementations<br>• Ensemble meta-model framework<br>• Feature engineering pipeline (46 features)<br>• FastAPI backend development<br>• Production deployment | 📧 [ishansurdi2105@gmail.com](mailto:ishansurdi2105@gmail.com)<br>🔗 [GitHub](https://github.com/ishansurdi) |
 
 ### Technical Contributions Breakdown
 
